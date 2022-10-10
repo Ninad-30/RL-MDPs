@@ -33,7 +33,7 @@ class CricketMDP():
         with open(parameters, 'r') as params:
             for param in params.readlines()[1:]:
                 param = param.split()
-                self.parametersA.append(param)
+                self.parametersA.append(param[1:])
         
         self.tot_balls = int(self.states[0][:2])
         self.tot_runs = int(self.states[0][2:])
@@ -61,12 +61,11 @@ class CricketMDP():
 
                 for a in range(len(self.actionsA)):
                     virtual_balls = balls_left - 1
-
                     for o,outcome in enumerate(self.outcomesA):
 
                         virtual_runs = runs_left - outcome
                         prob = self.parametersA[a][o]
-
+                        #print(f"action taken: {a}, outcome: {outcome}, virtual runs: {virtual_runs}")
                         if outcome == -1 or (virtual_runs > 0 and virtual_balls == 0):
                             # Game lost
                             state_jump_id = len(self.states)-1
@@ -80,12 +79,13 @@ class CricketMDP():
                             print("transition", i, self.actionsA[a], state_jump_id, reward, prob)
 
                         else:
-                            print("Game continues")
+                            #print("Game continues")
                             # Logical EXOR conditon between if its ball and whether even number of runs are scored and Game continues
                             if (outcome%2 == 0) != (virtual_balls%6 == 0):
                                 # Change strike if odd runs are score and its not the last ball
                                 # Change strike if even runs are scored and it is the last ball
                                 state_jump_id = ((virtual_balls - 1)*self.runs + virtual_runs)%self.strike_rot + 1
+                                print("transition", i, self.actionsA[a], state_jump_id, reward, prob)
                             else:
                                 # Dont change strike
                                 state_jump_id = (virtual_balls - 1)*self.runs + virtual_runs
@@ -148,6 +148,7 @@ if __name__ == "__main__":
     # print(Cricket.parametersA)
     # print(Cricket.parametersB)
     print(Cricket.states)
+    print(Cricket.parametersA)
     Cricket.determineMDPvalues()
     ## IDK what to do next???
     ## Mu me lo
