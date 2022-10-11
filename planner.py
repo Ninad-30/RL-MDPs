@@ -229,6 +229,7 @@ if __name__ == "__main__":
                                     
         for i in range(numStates):
             print(round(V_star[i],6), pi_star[i])
+        
 
 
 
