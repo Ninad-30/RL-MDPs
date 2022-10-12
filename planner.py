@@ -49,11 +49,13 @@ class MDP:
             self.T[int(t1[0]),int(t1[1]),int(t1[2])] += float(t1[4])
 
     def readPolicy(self, policy_file):
+
         V_pi = [0]*self.numStates
         with open(policy_file, 'r') as pf:
             lines = pf.readlines()
+            print(len(lines))
             for i in range(len(lines)):
-                V_pi[i] = int(lines[i].strip())
+                V_pi[i] = int(lines[i][0].strip())
         return np.array(V_pi)
 
 

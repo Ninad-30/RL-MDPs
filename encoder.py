@@ -35,7 +35,7 @@ class CricketMDP():
             for param in params.readlines()[1:]:
                 param = param.split()
                 self.parametersA.append(param[1:])
-        
+                        
         self.tot_balls = int(self.states[0][:2])
         self.tot_runs = int(self.states[0][2:])
         self.q = float(q)
@@ -523,10 +523,10 @@ class CricketMDP():
 
 
 if __name__ == "__main__":
-    parser.add_argument("--states", type=str, help="Path to the cricket file")
+    parser.add_argument("--states",required=True, type=str, help="Path to the cricket file")
     parser.add_argument("--mdp", type=str, help="Path to the MDP file")
-    parser.add_argument("--parameters", type=str, help="Path to the environment parameters")
-    parser.add_argument("--q", type=float, help="Weakness of the player")
+    parser.add_argument("--parameters", required=True, type=str, help="Path to the environment parameters")
+    parser.add_argument("--q", required=True, type=float, help="Weakness of the player")
     args = parser.parse_args()
 
     Cricket = CricketMDP()
