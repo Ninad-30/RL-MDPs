@@ -14,4 +14,3 @@ To verify output of Task 2, run python autograder.py --task 2<br>
 Plots are generated from plot_scripts directory, with certain conditions mentioned in Assignment2_details.txt
 
 
-
