@@ -48,7 +48,7 @@ class CricketMDP():
         print("end", len(self.states)-2, len(self.states)-1)
         debug_log = False
         #print("transition", "s", "a", "s", "r", "prob")
-        if debug_log:
+        if debug_log: # debug_log = True
             for i,state in enumerate(self.states):
                 if i == len(self.states)-1 or i == len(self.states)-2:
                     break
@@ -279,7 +279,7 @@ class CricketMDP():
 
             print("mdptype", "episodic")
             print("discount", 1)
-        else:
+        else: # debug_log = False
             for i,state in enumerate(self.states):
                 if i == len(self.states)-1 or i == len(self.states)-2:
                     break
@@ -307,7 +307,7 @@ class CricketMDP():
                                 # Game lost
                                 state_jump_id = len(self.states)-1
 
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                                
 
                                 if state_jump_id not in virtual_states_probs:
                                     virtual_states_probs[state_jump_id] = prob
@@ -319,7 +319,7 @@ class CricketMDP():
                                 # Game won
                                 state_jump_id = len(self.states)-2
 
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                                
                                 
                                 if state_jump_id not in virtual_states_probs:
                                     virtual_states_probs[state_jump_id] = prob
@@ -333,12 +333,10 @@ class CricketMDP():
                                 vstate_id = i + self.tot_runs + outcome 
                                 #   True                 
                                 if (outcome%2 == 0) == (virtual_balls%6 == 0):
-                                    # Change strike if odd runs are score and its not the last ball
-                                    # Change strike if even runs are scored and it is the last ball
-                                    #print(vstate_id, self.strike_rot, len(self.states)-2)
+                                    
                                     state_jump_id = (vstate_id + self.strike_rot)%(len(self.states))
 
-                                    #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}, Strike changed")
+                                   
                                     
                                     if state_jump_id not in virtual_states_probs:
                                         virtual_states_probs[state_jump_id] = prob
@@ -349,7 +347,7 @@ class CricketMDP():
                                     # Dont change strike
                                     state_jump_id = vstate_id
 
-                                    #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                                    
 
                                     if state_jump_id not in virtual_states_probs:
                                         virtual_states_probs[state_jump_id] = prob
@@ -364,10 +362,7 @@ class CricketMDP():
                             else:
                                 reward = 0
                             print("transition", i, self.action_index_map[self.actions[a]], vstates, reward, virtual_states_probs[vstates])
-                        # if prob_sum < 1:
-                        #     print("Probs do not add up to 1")
-                        # else:
-                        #     print("Probs do add up")
+                        
 
                 # Condition if B has strike
                 else:
@@ -389,9 +384,7 @@ class CricketMDP():
                                 else:
                                     virtual_states_probs[state_jump_id] += prob
 
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-
-                                #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                
                             
                             elif outcome == 0:
                                 state_jump_id = (virtual_balls - 1)*self.runs + runs_left + self.strike_rot
@@ -404,27 +397,22 @@ class CricketMDP():
                                     else:
                                         virtual_states_probs[state_jump_id] += prob
 
-                                    #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-
-                                    #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                    
                                 else:
                                     # Game continues
-                                    #print(balls_done) 
+                                    
                                     if virtual_balls%6 == 0:
                                         # Over. Strike changes (A gets strike)
                                         vstate_id = i + self.tot_runs + outcome
                                         state_jump_id = vstate_id - self.strike_rot
-                                        # print(f"vstate_id: {vstate_id}")
-                                        # print(f"state_jump_id: {state_jump_id}")
+                                        
                                         reward = 0
                                         if state_jump_id not in virtual_states_probs:
                                             virtual_states_probs[state_jump_id] = prob
                                         else:
                                             virtual_states_probs[state_jump_id] += prob
 
-                                        #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}, Strike Changes")
 
-                                        #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
                                     else:
                                         # Over. Strike doesnt change (B retains strike)
                                         vstate_id = i + self.tot_runs + outcome
@@ -435,14 +423,11 @@ class CricketMDP():
                                         else:
                                             virtual_states_probs[state_jump_id] += prob
 
-                                        #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-
-                                        #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                        
 
                             
                             else: # Outcome is 1
-                                # print(f"virtual_runs: {virtual_runs}")
-                                # print(f"virtual_balls: {virtual_balls}")
+                                
                                 
 
                                 if virtual_runs <= 0 and virtual_balls >= 0:
@@ -455,9 +440,7 @@ class CricketMDP():
                                         virtual_states_probs[state_jump_id] += prob
                                     
 
-                                    #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-
-                                    #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                    
 
                                 elif virtual_runs > 0 and virtual_balls <=0:
                                     # Game lost (Balls finished)
@@ -468,9 +451,7 @@ class CricketMDP():
                                     else:
                                         virtual_states_probs[state_jump_id] += prob
 
-                                    #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-
-                                    #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                    
 
                                 else:
                                     # Game continues
@@ -484,9 +465,7 @@ class CricketMDP():
                                         else:
                                             virtual_states_probs[state_jump_id] += prob
 
-                                        #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}, Strike changed")
                                         
-                                        #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
                                     else:
                                         # Over. Strike doesnt change (B retains strike)
                                         vstate_id = i + self.tot_runs + outcome
@@ -497,9 +476,7 @@ class CricketMDP():
                                         else:
                                             virtual_states_probs[state_jump_id] += prob
                                         
-                                        #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
                                         
-                                        #print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
                         for vstates in virtual_states_probs:
                                 prob_sum += virtual_states_probs[vstates]
                                 if vstates == len(self.states)-2:
@@ -535,10 +512,7 @@ if __name__ == "__main__":
     #print(Cricket.states)
     # print(Cricket.parametersA)
     Cricket.determineMDPvalues()
-    #print(Cricket.action_index_map[6])
-    ## IDK what to do next???
-    ## Mu me lo
-
+    
 
 
 
