@@ -49,6 +49,8 @@ class CricketMDP():
         print("end", len(self.states)-2, len(self.states)-1)
         #print("transition", "s", "a", "s", "r", "prob")
         for i,state in enumerate(self.states):
+            if i == len(self.states)-1 or i == len(self.states)-2:
+                break
             # Determining the current situation
             curr_state = state
             if(curr_state == "lost" or curr_state == "won"):
@@ -62,6 +64,7 @@ class CricketMDP():
 
                 for a in range(len(self.actions)):
                     virtual_balls = balls_left - 1
+                    balls_done = self.tot_balls - virtual_balls
                     virtual_states_probs = {}
 
                     for o,outcome in enumerate(self.outcomesA):
@@ -93,8 +96,8 @@ class CricketMDP():
                             #print("Game continues")
                             # Logical EXOR conditon between if its ball and whether even number of runs are scored and Game continues
                             vstate_id = i + self.tot_runs + outcome # This one gives correct next state
-                            
-                            if (outcome%2 == 0) == (virtual_balls%6 == 0):
+                            #   True                 
+                            if (outcome%2 == 0) == (balls_done%6 == 0):
                                 # Change strike if odd runs are score and its not the last ball
                                 # Change strike if even runs are scored and it is the last ball
                                 #print(vstate_id, self.strike_rot, len(self.states)-2)
@@ -121,7 +124,7 @@ class CricketMDP():
                             reward = 1
                         else:
                             reward = 0
-                        #print("transition", i, self.action_index_map[self.actions[a]], vstates, reward, virtual_states_probs[vstates])
+                        print("transition", i, self.action_index_map[self.actions[a]], vstates, reward, virtual_states_probs[vstates])
                     # if prob_sum < 1:
                     #     print("Probs do not add up to 1")
                     # else:
@@ -129,59 +132,88 @@ class CricketMDP():
 
             # Condition if B has strike
             else:
-                for a in self.actions:
-                    for o,outcome in enumerate(self.outcomesB):
-                        virtual_balls = balls_left - 1
-                        virtual_runs = runs_left - outcome
-                        prob = self.parametersB[o]
+            
+                virtual_balls = balls_left - 1
+                balls_done = self.tot_balls - virtual_balls
+                for o,outcome in enumerate(self.outcomesB):
+                    
+                    virtual_runs = runs_left - outcome
+                    prob = self.parametersB[o]
 
-                        if outcome == -1:
+                    if outcome == -1:
+                        # Game lost
+                        state_jump_id = len(self.states)-1
+                        reward = 0
+                        #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+
+                        print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                    
+                    elif outcome == 0:
+                        state_jump_id = (virtual_balls - 1)*self.runs + runs_left + self.strike_rot
+                        if virtual_runs > 0 and virtual_balls <= 0:
+                            # Game lost (Balls finished)
                             state_jump_id = len(self.states)-1
                             reward = 0
                             #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
 
                             print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
-                        
-                        elif outcome == 0:
-                            state_jump_id = (virtual_balls - 1)*self.runs + runs_left + self.strike_rot
-                            if virtual_runs > 0 and virtual_balls <= 0:
-                                # Game lost
-                                state_jump_id = len(self.states)-1
+                        else:
+                            # Game continues 
+                            if balls_done%6 == 0:
+                                # Over. Strike changes (A gets strike)
+                                vstate_id = i + self.tot_runs + outcome
+                                state_jump_id = vstate_id - self.strike_rot
+                                # print(f"vstate_id: {vstate_id}")
+                                # print(f"state_jump_id: {state_jump_id}")
                                 reward = 0
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}, Strike Changes")
 
                                 print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
                             else:
-                                # Game continues and strike doesnt change
+                                # Over. Strike doesnt change (B retains strike)
                                 vstate_id = i + self.tot_runs + outcome
                                 state_jump_id = vstate_id
                                 reward = 0
                                 #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
 
                                 print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
-                        
+
+                    
+                    else:
+                        # print(f"virtual_runs: {virtual_runs}")
+                        # print(f"virtual_balls: {virtual_balls}")
+
+                        if virtual_runs <= 0 and virtual_balls >= 0:
+                            # Game won
+                            state_jump_id = len(self.states)-2
+                            reward = 1
+                            #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                            print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+
+                        elif virtual_runs > 0 and virtual_balls <=0:
+                            # Game lost (Balls finished)
+                            state_jump_id = len(self.states)-1
+                            reward = 0
+                            #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                            print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+
                         else:
-                            if virtual_runs <= 0 and virtual_balls >= 0:
-                                # Game won
-                                state_jump_id = len(self.states)-2
-                                reward = 1
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-                                print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
-
-                            elif virtual_runs > 0 and virtual_balls <=0:
-                                # Game lost
-                                state_jump_id = len(self.states)-2
-                                reward = 0
-                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
-                                print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
-
-                            else:
-                                # Game continues and strike changes
+                            # Game continues
+                            if not balls_done%6 == 0:
+                                # Over. Strike changes (A gets strike)
                                 vstate_id = i + self.tot_runs + outcome
                                 state_jump_id = (vstate_id - self.strike_rot)%(len(self.states))
                                 reward = 0
                                 #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}, Strike changed")
                                 print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                            else:
+                                # Over. Strike doesnt change (B retains strike)
+                                vstate_id = i + self.tot_runs + outcome
+                                state_jump_id = vstate_id
+                                reward = 0
+                                #print(f"state: {i, self.states[i]}, outcome: {outcome}, next_state: {state_jump_id, self.states[state_jump_id]}")
+                                print("transition", i, self.action_index_map[a], state_jump_id, reward, prob)
+                                    
 
         print("mdptype", "episodic")
         print("discount", 1)
