@@ -53,7 +53,7 @@ class MDP:
         V_pi = [0]*self.numStates
         with open(policy_file, 'r') as pf:
             lines = pf.readlines()
-            print(len(lines))
+            #print(len(lines))
             for i in range(len(lines)):
                 V_pi[i] = int(lines[i][0].strip())
         return np.array(V_pi)

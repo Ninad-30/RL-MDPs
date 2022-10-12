@@ -15,7 +15,6 @@ class CricketMDP():
         self.q = 0
         self.balls = 0
         self.runs = 0
-        self.terminal_states = ['out', 'balls_over', 'win']
         self.actions = [0,1,2,4,6] # The attempts
         self.outcomesA = [-1,0,1,2,3,4,6] # The outcomes for A
         self.outcomesB = [-1,0,1] # The outcomes for B

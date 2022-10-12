@@ -22,7 +22,6 @@ os.system("python decoder.py --states cricket_state_list.txt --value-policy poli
 rand_pol = []
 for i in range(15):
     rand_pol.append(0)
-
 with open("policyfile") as f:
     for line in f:
         balls = 10*int(line[0])+int(line[1])
