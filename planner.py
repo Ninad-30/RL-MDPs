@@ -45,8 +45,8 @@ class MDP:
     def set_TandR_probs(self, T):
         # here T has to be list containing lines directly from the mdp txt file
         for t1 in T:
-            self.R[int(t1[0]),int(t1[1]),int(t1[2])] = float(t1[3])
-            self.T[int(t1[0]),int(t1[1]),int(t1[2])] = float(t1[4])
+            self.R[int(t1[0]),int(t1[1]),int(t1[2])] += float(t1[3])
+            self.T[int(t1[0]),int(t1[1]),int(t1[2])] += float(t1[4])
 
     def readPolicy(self, policy_file):
         V_pi = [0]*self.numStates
@@ -226,7 +226,12 @@ if __name__ == "__main__":
             V_star, pi_star = mdp.LP()
         elif args.algorithm == 'default':
             V_star, pi_star = mdp.Value_Iteration()
-                                    
+
+        # print(mdp.numStates)
+        # print(mdp.numActions)
+        # print(mdp.endStates)
+        # print(mdp.mdptype)
+        # print(mdp.gamma)                            
         for i in range(numStates):
             print(round(V_star[i],6), pi_star[i])
         
